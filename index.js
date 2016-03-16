@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var fs = require('fs'),
 	program = require('commander'),
 	package = require('./package.json')
@@ -87,9 +89,10 @@ var poll = port => function *() {
 	setTimeout(() => co(poll(port)), nextPollInterval)
 }
 
+portfinder.basePort = Math.floor(Math.random() * 10000) + 10000
 portfinder.getPort((err, port) => {
 	if (port > 0)
-		co(start(port))
+		setTimeout(() => co(start(port)), Math.random() * 1000)
 	else
 		console.error(err || 'no available port now')
 })
