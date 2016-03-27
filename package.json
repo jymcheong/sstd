@@ -1,12 +1,15 @@
 {
   "name": "sstd",
   "version": "0.0.1",
-  "description": "simple stupid hasty tunnel - an autossh alternative powered by pm2",
+  "description": "simple ssh tunnel daemon - an autossh alternative powered by pm2",
   "main": "index.js",
   "bin": {
     "sstd": "index.js"
   },
-  "repository": "https://github.com/oxyflour/sstd",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oxyflour/sstd.git"
+  },
   "author": "oxyflour <oxyflour@hotmail.com>",
   "license": "MIT",
   "dependencies": {
