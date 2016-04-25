@@ -39,6 +39,17 @@ module.exports = function(config) {
 		setTimeout(() => co($poll), config.pollFirstup)
 	}
 
+	var $restart = function *() {
+		try {
+			yield pm2.$connect()
+			yield pm2.$restart(config.daemonName)
+			yield pm2.$disconnect()
+		}
+		catch (e) {
+			logger.error('restart daemon failed (port ' + listenPort + ')')
+		}
+	}
+
 	var $poll = function *() {
 		try {
 			yield $request({
@@ -46,14 +57,15 @@ module.exports = function(config) {
 				timeout: config.pollTimeout
 			})
 			logger.info('tunnel via port ' + listenPort + ' ok')
+
 			nextPollInterval = config.pollInterval
 		}
 		catch (e) {
-			logger.warn(e.message)
-			yield pm2.$connect()
-			yield pm2.$restart(config.daemonName)
-			yield pm2.$disconnect()
-			logger.info('tunnel restarted')
+			logger.warn(e.message + ' (port ' + listenPort + ')')
+			
+			yield $restart()
+			logger.info('tunnel restarted (port ' + listenPort + ')')
+
 			nextPollInterval = nextPollInterval > config.pollInterval ? 
 				// if it has failed for many times before, use a larger poll interval every time
 				Math.min(nextPollInterval + 2000, config.pollMaxInterval) : config.pollFirstup
