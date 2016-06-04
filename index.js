@@ -5,8 +5,26 @@ var pm2 = require('pm2'),
 	log4js = require('log4js'),
 	co = require('co')
 
-'connect|disconnect|start|delete|restart'.split('|')
+'start|delete|restart'.split('|')
 	.forEach(fn => pm2['$' + fn] = promisify(pm2[fn].bind(pm2)))
+
+var $connect = promisify(pm2.connect.bind(pm2)),
+	$disconnect = promisify(pm2.disconnect.bind(pm2)),
+	$sleep = time => new Promise(resolve => setTimeout(resolve, time)),
+	connLocked = false
+
+pm2.$connect = _ => co(function *() {
+	while (connLocked)
+		yield $sleep(200)
+
+	yield $connect()
+	connLocked = true
+})
+
+pm2.$disconnect = _ => co(function *() {
+	connLocked = false
+	yield $disconnect()
+})
 
 var $request = promisify(request),
 	$findport = promisify(portfinder.getPort.bind(portfinder)),
