@@ -1,6 +1,6 @@
 {
   "name": "sstd",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "simple ssh tunnel daemon - an autossh alternative powered by pm2",
   "main": "index.js",
   "bin": {
